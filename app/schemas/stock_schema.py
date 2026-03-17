@@ -16,4 +16,13 @@ class StockAnalysisContext:
 
     summary: str = ""
     
-    
+
+class StockRequest(BaseModel):
+    symbol: str
+
+class StockResponse(BaseModel):
+    symbol: str
+    technical: Dict[str, Any]
+    news: Dict[str, Any]
+    fundamental: Dict[str, Any]
+    summary: str
