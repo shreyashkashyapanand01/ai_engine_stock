@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+requests
+pandas
+numpy
+yfinance
+groq
+dotenv
+requests
+pydantic
