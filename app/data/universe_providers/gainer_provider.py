@@ -1,8 +1,12 @@
+import logging
 import requests
 
 from app.config import top_limit, per_sector_limit
 
+logger = logging.getLogger(__name__)
+
 def fetch_top_sector_performers(limit_per_sector=per_sector_limit, total_top_limit=top_limit):
+    logger.info("gainer_provider: Started fetching top sector performers from NSE")
     session = requests.Session()
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
@@ -14,7 +18,7 @@ def fetch_top_sector_performers(limit_per_sector=per_sector_limit, total_top_lim
     try:
         session.get("https://www.nseindia.com", headers=headers, timeout=10)
     except Exception as e:
-        print(f"Connection Error: {e}")
+        logger.error(f"Error in gainer_provider.py at fetch_top_sector_performers: Connection Error: {e}")
         return []
 
     # Step 2: Fetch the Analysis Data
@@ -22,7 +26,7 @@ def fetch_top_sector_performers(limit_per_sector=per_sector_limit, total_top_lim
     response = session.get(url, headers=headers)
     
     if response.status_code != 200:
-        print(f"Error fetching data: {response.status_code}")
+        logger.error(f"Error in gainer_provider.py at fetch_top_sector_performers: Error fetching data: {response.status_code}")
         return []
 
     data = response.json()
@@ -68,12 +72,5 @@ def fetch_top_sector_performers(limit_per_sector=per_sector_limit, total_top_lim
     sorted_stocks = sorted(all_selected_stocks, key=lambda x: x['perChange'], reverse=True)
 
     # Return only the top 15
+    logger.info(f"gainer_provider: Successfully finished fetching {len(sorted_stocks[:total_top_limit])} stocks")
     return sorted_stocks[:total_top_limit]
-
-# if __name__ == "__main__":
-#     top_stocks = fetch_top_sector_performers()
-    
-#     print(f"{'Rank':<5} {'Symbol':<15} {'Sector':<15} {'% Change':<10} {'LTP':<10}")
-#     print("-" * 60)
-#     for i, stock in enumerate(top_stocks, 1):
-#         print(f"{i:<5} {stock['symbol']:<15} {stock['sector']:<15} {stock['perChange']:>8.2f}% {stock['ltp']:>10.2f}")
