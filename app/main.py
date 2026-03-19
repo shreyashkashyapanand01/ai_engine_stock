@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.stock_api import router as stock_router
 from app.api.scan_api import router as scan_router
+from app.api.trade_api import router as trade_router
 
 from app.logging_config import setup_logging
 
@@ -32,7 +33,7 @@ def create_app() -> FastAPI:
     #  Register routers
     app.include_router(stock_router, prefix="")
     app.include_router(scan_router, prefix="")
-    
+    app.include_router(trade_router, prefix="")
     logger.info("Application routers registered successfully.")
 
     return app
