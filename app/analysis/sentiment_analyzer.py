@@ -3,11 +3,11 @@ import os
 from groq import Groq
 from app.tools.news_tool import fetch_news
 from app.config import llm_model
-import json
-import re
 
 logger = logging.getLogger(__name__)
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+import json
+import re
 
 
 def safe_parse_llm_json(content: str):
@@ -29,24 +29,24 @@ def safe_parse_llm_json(content: str):
         return parsed
 
     except Exception as e:
-        logger.error(f"Error in sentiment_analyzer.py at safe_parse_llm_json: JSON parsing failed - {str(e)} | Raw: {content}")
+        logger.error(f"JSON parsing failed: {str(e)} | Raw: {content}")
         return None
 
 def get_news_sentiment(symbol: str):
-    logger.info(f"sentiment_analyzer: Started analyzing sentiment for {symbol}")
+    logger.info(f"sentiment_analyzer: Analyzing sentiment for {symbol}")
 
     try:
         headlines = fetch_news(symbol)
 
         if not headlines:
-            logger.warning(f"sentiment_analyzer: No news found for {symbol}, returning default values")
+            logger.warning(f"sentiment_analyzer: no new news found for {symbol}, so returnig default values")
             return {
                 "sentiment": "Neutral",
                 "confidence": 0.5,
                 "headlines": []
             }
-        
-        logger.info(f"sentiment_analyzer: {len(headlines)} news headlines found for {symbol}, requesting AI analysis")
+            
+        logger.info(f"sentiment_analyzer: news found for {symbol}, doing news sentiment analysys")
 
         prompt = f"""
         Analyze the sentiment of the following news headlines for stock {symbol}.
@@ -55,9 +55,9 @@ def get_news_sentiment(symbol: str):
         {headlines}
 
         Strictly Return ONLY in JSON format:
-        Return ONLY valid JSON.
-        Do NOT include any text before or after JSON.
-        Do NOT explain anything.
+        Strictly Return ONLY valid JSON.
+        Strictly Do NOT include any text before or after JSON.
+        Strictly Do NOT explain anything.
         {{
             "sentiment": "Bullish | Bearish | Neutral",
             "confidence": 0 to 1
@@ -73,8 +73,8 @@ def get_news_sentiment(symbol: str):
             temperature=0.2
         )
 
-        content = response.choices[0].message.content.strip()       
-        
+        content = response.choices[0].message.content.strip()  
+             
         # import json
         # #parsed = json.loads(content)
         # import re
@@ -84,10 +84,10 @@ def get_news_sentiment(symbol: str):
         parsed = safe_parse_llm_json(content)
         
         if not parsed:
-            raise ValueError("Invalid LLM JSON response after cleaning")
-
-        logger.info(f"sentiment_analyzer: Successfully finished sentiment analysis for {symbol}")
+            raise ValueError("Invalid LLM JSON response")
         
+        logger.info(f"sentiment_analyzer: Successfully finished sentiment analysis for {symbol}")
+
         return {
             "sentiment": parsed.get("sentiment", "Neutral"),
             "confidence": round(float(parsed.get("confidence", 0.5)), 2),
@@ -95,7 +95,7 @@ def get_news_sentiment(symbol: str):
         }
 
     except Exception as e:
-        logger.error(f"Error in sentiment_analyzer.py at get_news_sentiment: Failed for {symbol} - {str(e)}")
+        logger.error(f"sentiment_analyzer: Failed for {symbol} - {str(e)}")
         return {
             "sentiment": "Neutral",
             "confidence": 0.5,

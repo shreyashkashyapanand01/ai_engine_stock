@@ -72,7 +72,7 @@ def generate_portfolio_decision(context):
         }
 
     except Exception as e:
-        logger.error(f"Error in portfolio_agent.py at generate_portfolio_decision: Failed to generate AI insights - {str(e)}")
+        logger.error(f"portfolio_agent: Failed - {str(e)}")
 
         return {
             "analysisId": str(uuid.uuid4()),
